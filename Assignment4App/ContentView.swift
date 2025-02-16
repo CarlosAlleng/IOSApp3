@@ -5,10 +5,11 @@
 //  Created by Carlos Alleng on 2025-02-06.
 
 
-
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var userManager: UserManager
+    
     let clues = [
         "Find the pond with a bridge in gairloch gardens.",
         "Look for Oakville's First Post Office.",
@@ -24,6 +25,7 @@ struct ContentView: View {
     
     @State private var foundItems: Set<Int> = []
     @State private var selectedImage: UIImage? = nil
+    @State private var showingLogoutAlert = false
     
     var discountMessage: String {
         switch foundItems.count {
@@ -61,6 +63,17 @@ struct ContentView: View {
                         .padding(.leading)
                         
                         Spacer()
+                        
+                        // Add logout button
+                        Button(action: { showingLogoutAlert = true }) {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .font(.system(size: 24))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.blue.opacity(0.5))
+                                .clipShape(Circle())
+                        }
+                        .padding(.trailing)
                     }
                     
                     Text("CITYWIDE SCAVENGER HUNT")
@@ -131,6 +144,16 @@ struct ContentView: View {
                 .padding()
             }
             .navigationBarHidden(true)
+            .alert(isPresented: $showingLogoutAlert) {
+                Alert(
+                    title: Text("Logout"),
+                    message: Text("Are you sure you want to logout?"),
+                    primaryButton: .destructive(Text("Logout")) {
+                        userManager.currentUser = nil
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
         }
     }
 }
@@ -138,5 +161,8 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .environmentObject(UserManager()) // Add this line
     }
 }
+
+
